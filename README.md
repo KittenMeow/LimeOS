@@ -8,3 +8,9 @@ i686-elf-gcc -T linker.ld -o myos.bin -ffreestanding -O2 -nostdlib boot.o kernel
 qemu-system-i386 -kernel myos.bin
 
 As a note, if you use WSL1, you'll have to copy the myos.bin from WSL to another place outside of WSL if you want to use Command Prompt to run it.
+  
+PLANS
+  Testing - GDT
+  Testing/Late Dev - Paging
+  Not Started - Interrupts/Exceptions
+  Not Started - Heap
