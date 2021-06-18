@@ -1,32 +1,16 @@
-extern base
-extern limit
+[GLOBAL gdt_flush]    ; Allows the C code to call gdt_flush().
 
-gdtr DW 0 ; For limit storage
-     DD 0 ; For base storage
- 
-setGdt:
-   XOR   EAX, EAX
-   MOV   AX, DS
-   SHL   EAX, 4
-   ADD   EAX, base
-   MOV   [gdtr + 2], eax
-   MOV   EAX, limit
-   SUB   EAX, base
-   MOV   [gdtr], AX
-   LGDT  [gdtr]
-   RET
+gdt_flush:
+   mov eax, [esp+4]  ; Get the pointer to the GDT, passed as a parameter.
+   lgdt [eax]        ; Load the new GDT pointer
 
-reloadSegments:
-   ; Reload CS register containing code selector:
-   lgdt [gdtr]
-   JMP   0x08:reload_CS ; 0x08 points at the new code selector
-reload_CS:
-   ; Reload data segment registers:
-   MOV   AX, 0x10 ; 0x10 points at the new data selector
-   MOV   DS, AX
-   MOV   ES, AX
-   MOV   FS, AX
-   MOV   GS, AX
-   MOV   SS, AX
-   RET
+   mov ax, 0x10      ; 0x10 is the offset in the GDT to our data segment
+   mov ds, ax        ; Load all data segment selectors
+   mov es, ax
+   mov fs, ax
+   mov gs, ax
+   mov ss, ax
+   jmp 0x08:.flush   ; 0x08 is the offset to our code segment: Far jump!
+.flush:
+   ret
 
